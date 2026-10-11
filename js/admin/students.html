@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Students — Admin — De-Pythagoras College</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <div class="sidebar__brand">
+        <div class="logo__mark" style="width:36px;height:36px;font-size:0.9rem;">H</div>
+        <div><div style="font-weight:700;font-size:0.9rem;">HHA Admin</div></div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__link">Dashboard</a>
+        <a href="students.html" class="sidebar__link is-active">Students</a>
+        <a href="attendance.html" class="sidebar__link">Attendance</a>
+        <a href="results.html" class="sidebar__link">Results</a>
+        <a href="#" class="sidebar__link" id="logout-btn">Sign Out</a>
+      </nav>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-header">
+        <strong>Student Records</strong>
+      </header>
+      <div class="app-content">
+        <div class="alert alert--info">Demo data only. Production systems must enforce server-side access control and never expose student records via static files.</div>
+
+        <div class="card" style="margin-bottom: var(--space-4);">
+          <div class="card__body" style="display:flex; gap: var(--space-3); flex-wrap:wrap; align-items:end;">
+            <div class="form-group" style="margin:0; flex:1; min-width:160px;">
+              <label class="form-label" for="search">Search</label>
+              <input type="search" id="search" class="form-input" placeholder="Name or ID...">
+            </div>
+            <div class="form-group" style="margin:0; min-width:120px;">
+              <label class="form-label" for="filter-class">Class</label>
+              <select id="filter-class" class="form-select">
+                <option value="">All</option>
+                <option value="SS1">SS1</option>
+                <option value="SS2">SS2</option>
+                <option value="SS3">SS3</option>
+              </select>
+            </div>
+            <button class="btn btn--primary" id="filter-btn">Filter</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="table" id="students-table">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Full Name</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Parent Contact</th>
+              </tr>
+            </thead>
+            <tbody id="students-body">
+              <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/modules/demo-data.js"></script>
+  <script src="../js/modules/demo-api.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/modules/auth.js"></script>
+  <script>
+    const user = Auth.requireRole(["super_admin", "school_admin", "teacher"]);
+    if (!user) {}
+    document.getElementById("logout-btn").addEventListener("click", (e) => { e.preventDefault(); Auth.logout(); });
+
+    let allStudents = [];
+
+    async function loadStudents() {
+      try {
+        const res = await API.getStudents();
+        allStudents = res.data || [];
+        renderTable(allStudents);
+      } catch (err) {
+        document.getElementById("students-body").innerHTML = `<tr><td colspan="5"><div class="alert alert--error">${err.message}</div></td></tr>`;
+      }
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById("students-body");
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No students found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(s => `
+        <tr>
+          <td><code>${s.id}</code></td>
+          <td>${s.fullName}</td>
+          <td>${s.class}${s.classArm}</td>
+          <td><span class="badge badge--success">${s.status}</span></td>
+          <td style="font-size:var(--text-xs);">${s.parentPhone || "—"}</td>
+        </tr>
+      `).join("");
+    }
+
+    document.getElementById("filter-btn").addEventListener("click", () => {
+      const q = document.getElementById("search").value.toLowerCase();
+      const cls = document.getElementById("filter-class").value;
+      let filtered = allStudents;
+      if (q) filtered = filtered.filter(s => s.fullName.toLowerCase().includes(q) || s.id.toLowerCase().includes(q));
+      if (cls) filtered = filtered.filter(s => s.class === cls);
+      renderTable(filtered);
+    });
+
+    loadStudents();
+  </script>
+</body>
+</html>

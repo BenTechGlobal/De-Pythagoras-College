@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>My Profile — De-Pythagoras College</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <div class="sidebar__brand">
+        <div class="logo__mark" style="width:36px;height:36px;font-size:0.9rem;">H</div>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;">HHA Portal</div>
+          <div style="font-size:0.7rem;opacity:0.7;" id="sidebar-role">Student</div>
+        </div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__link">Dashboard</a>
+        <a href="results.html" class="sidebar__link">My Results</a>
+        <a href="profile.html" class="sidebar__link is-active">Profile</a>
+        <a href="#" class="sidebar__link" id="logout-btn">Sign Out</a>
+      </nav>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-header">
+        <strong>Profile</strong>
+      </header>
+      <div class="app-content">
+        <div class="alert alert--info">Profile information is read-only in the student portal. Contact the school office for corrections.</div>
+        <div class="card" id="profile-card">
+          <div class="card__body">
+            <div class="loading-overlay"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/modules/demo-data.js"></script>
+  <script src="../js/modules/demo-api.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/modules/auth.js"></script>
+  <script>
+    const user = Auth.requireRole(["student", "parent"]);
+    if (!user) {}
+
+    document.getElementById("sidebar-role").textContent = user.role === "parent" ? "Parent" : "Student";
+    document.getElementById("logout-btn").addEventListener("click", (e) => { e.preventDefault(); Auth.logout(); });
+
+    let studentId = user.studentId;
+    if (user.role === "parent" && user.linkedStudents?.length) studentId = user.linkedStudents[0];
+
+    (async () => {
+      const card = document.getElementById("profile-card");
+      try {
+        const res = await API.getStudent(studentId);
+        const s = res.data;
+        card.innerHTML = `
+          <div class="card__header"><h2 class="card__title">${s.fullName}</h2></div>
+          <div class="card__body">
+            <div class="grid grid--2" style="gap: var(--space-4);">
+              <div><strong>Student ID</strong><p>${s.id}</p></div>
+              <div><strong>Class</strong><p>${s.class} ${s.classArm}</p></div>
+              <div><strong>Status</strong><p><span class="badge badge--success">${s.status}</span></p></div>
+              <div><strong>Session</strong><p>${s.session}</p></div>
+              <div><strong>Admission Date</strong><p>${s.admissionDate}</p></div>
+              <div><strong>Date of Birth</strong><p>${s.dateOfBirth}</p></div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        card.innerHTML = `<div class="card__body"><div class="alert alert--error">${err.message}</div></div>`;
+      }
+    })();
+  </script>
+</body>
+</html>

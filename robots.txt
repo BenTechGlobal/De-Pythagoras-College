@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /portal/
+Disallow: /admin/
+Disallow: /data/
+
+Sitemap: https://harmonyheights.edu.ng/sitemap.xml
