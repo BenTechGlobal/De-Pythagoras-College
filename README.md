@@ -1,4 +1,4 @@
-# Harmony Heights Academy — School Website & Student Information System
+# De-Pythagoras-College — School Website & Student Information System
 
 A complete, production-oriented **public school website** built with **vanilla HTML5, CSS3, and JavaScript**, plus integration-ready interfaces for a secure **Student Information and Academic Results Management System**.
 
