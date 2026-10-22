@@ -1,0 +1,110 @@
+/* ============================================================
+   Responsive Adjustments
+   ============================================================ */
+
+/* Large tablets and below */
+@media (max-width: 1024px) {
+  .section {
+    padding-block: var(--space-12);
+  }
+
+  .hero__content {
+    text-align: center;
+  }
+
+  .hero__actions {
+    justify-content: center;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 64px;
+  }
+
+  .section {
+    padding-block: var(--space-10);
+  }
+
+  .section__title {
+    font-size: var(--text-2xl);
+  }
+
+  .btn--lg {
+    padding: 0.875rem 1.5rem;
+  }
+
+  /* Mobile nav */
+  .nav__menu {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-surface);
+    flex-direction: column;
+    padding: var(--space-6);
+    gap: var(--space-2);
+    transform: translateX(100%);
+    transition: transform var(--transition-base);
+    z-index: var(--z-dropdown);
+    overflow-y: auto;
+  }
+
+  .nav__menu.is-open {
+    transform: translateX(0);
+  }
+
+  .nav__toggle {
+    display: flex !important;
+  }
+
+  .nav__link {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    border-radius: var(--radius-md);
+  }
+
+  .nav__actions {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .nav__actions .btn {
+    width: 100%;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .container {
+    padding-inline: var(--space-3);
+  }
+
+  .section {
+    padding-block: var(--space-8);
+  }
+
+  .hero__title {
+    font-size: var(--text-3xl) !important;
+  }
+
+  .stat-card__value {
+    font-size: var(--text-2xl);
+  }
+
+  .card__body {
+    padding: var(--space-4);
+  }
+
+  .table th,
+  .table td {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+}
+
+/* Print is handled in print.css */

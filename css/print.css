@@ -1,0 +1,219 @@
+/* ============================================================
+   Print Styles — Result Sheets & Reports
+   ============================================================ */
+
+@media print {
+  /* Hide non-essential UI */
+  .site-header,
+  .site-footer,
+  .nav,
+  .btn,
+  .app-sidebar,
+  .app-header,
+  .no-print,
+  .pagination,
+  .modal-overlay,
+  .skip-link {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  .container,
+  .app-content,
+  .app-main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Result sheet specific */
+  .result-sheet {
+    page-break-after: always;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.5in !important;
+    margin: 0 !important;
+  }
+
+  .result-sheet:last-child {
+    page-break-after: auto;
+  }
+
+  .result-sheet__header {
+    border-bottom: 2px solid #0B3D5C;
+    padding-bottom: 12pt;
+    margin-bottom: 16pt;
+  }
+
+  .result-sheet__logo {
+    max-height: 60px;
+  }
+
+  .result-sheet table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 10pt;
+  }
+
+  .result-sheet th,
+  .result-sheet td {
+    border: 1px solid #333;
+    padding: 4pt 6pt;
+  }
+
+  .result-sheet th {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Avoid breaking inside important blocks */
+  .result-sheet__student-info,
+  .result-sheet__summary,
+  .result-sheet__comments {
+    page-break-inside: avoid;
+  }
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+  /* Ensure good contrast in B&W */
+  .badge {
+    border: 1px solid #666;
+    background: transparent !important;
+    color: black !important;
+  }
+}
+
+/* Screen preview of print layout */
+.result-sheet {
+  background: white;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 20mm;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+}
+
+.result-sheet__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  border-bottom: 3px solid var(--color-primary);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.result-sheet__school-info h1 {
+  font-size: 18pt;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.result-sheet__school-info p {
+  font-size: 9pt;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.result-sheet__title {
+  text-align: center;
+  font-size: 14pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 16px 0;
+  color: var(--color-primary);
+}
+
+.result-sheet__student-info {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 10pt;
+}
+
+.result-sheet__photo {
+  width: 80px;
+  height: 90px;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+}
+
+.result-sheet__table {
+  width: 100%;
+  margin-bottom: 16px;
+  font-size: 9pt;
+}
+
+.result-sheet__table th {
+  background: var(--color-bg-alt);
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 4px;
+  border: 1px solid var(--color-border-strong);
+}
+
+.result-sheet__table td {
+  padding: 5px 4px;
+  border: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.result-sheet__table td:first-child {
+  text-align: left;
+}
+
+.result-sheet__summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+  font-size: 10pt;
+}
+
+.result-sheet__summary-item {
+  text-align: center;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.result-sheet__summary-item strong {
+  display: block;
+  font-size: 14pt;
+  color: var(--color-primary);
+}
+
+.result-sheet__comments {
+  margin-top: 16px;
+  font-size: 10pt;
+}
+
+.result-sheet__comments p {
+  margin-bottom: 8px;
+}
+
+.result-sheet__signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  margin-top: 32px;
+  font-size: 9pt;
+  text-align: center;
+}
+
+.result-sheet__sig-line {
+  border-top: 1px solid #333;
+  margin-top: 40px;
+  padding-top: 4px;
+}

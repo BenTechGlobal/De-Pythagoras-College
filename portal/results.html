@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>My Results — De-Pythagoras College</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <div class="sidebar__brand">
+        <div class="logo__mark" style="width:36px;height:36px;font-size:0.9rem;">DPC</div>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;">DPC Portal</div>
+          <div style="font-size:0.7rem;opacity:0.7;" id="sidebar-role">Student</div>
+        </div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__link">Dashboard</a>
+        <a href="results.html" class="sidebar__link is-active">My Results</a>
+        <a href="profile.html" class="sidebar__link">Profile</a>
+        <a href="#" class="sidebar__link" id="logout-btn">Sign Out</a>
+      </nav>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-header">
+        <strong>Academic Results</strong>
+        <button class="btn btn--primary btn--sm no-print" onclick="window.print()">Print / Save PDF</button>
+      </header>
+
+      <div class="app-content">
+        <div class="alert alert--info no-print">
+          Only <strong>published</strong> results are shown. Demo data is synthetic.
+        </div>
+
+        <div class="card no-print" style="margin-bottom: var(--space-6);">
+          <div class="card__body" style="display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: end;">
+            <div class="form-group" style="margin:0; flex:1; min-width:140px;">
+              <label class="form-label" for="session-select">Session</label>
+              <select id="session-select" class="form-select">
+                <option value="2025/2026">2025/2026</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0; flex:1; min-width:140px;">
+              <label class="form-label" for="term-select">Term</label>
+              <select id="term-select" class="form-select">
+                <option value="First Term">First Term</option>
+                <option value="Second Term">Second Term</option>
+                <option value="Third Term">Third Term</option>
+              </select>
+            </div>
+            <button class="btn btn--primary" id="load-results-btn">Load Results</button>
+          </div>
+        </div>
+
+        <div id="results-container">
+          <div class="empty-state">
+            <p class="empty-state__title">Select session and term</p>
+            <p>Then click Load Results to view published reports.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/modules/demo-data.js"></script>
+  <script src="../js/modules/demo-api.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/modules/auth.js"></script>
+  <script>
+    const user = Auth.requireRole(["student", "parent"]);
+    if (!user) {}
+
+    document.getElementById("sidebar-role").textContent = user.role === "parent" ? "Parent" : "Student";
+    document.getElementById("logout-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      Auth.logout();
+    });
+
+    // Determine student ID
+    let studentId = user.studentId;
+    if (user.role === "parent" && user.linkedStudents?.length) {
+      studentId = user.linkedStudents[0];
+    }
+
+    async function loadResults() {
+      const session = document.getElementById("session-select").value;
+      const term = document.getElementById("term-select").value;
+      const container = document.getElementById("results-container");
+      container.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
+
+      try {
+        const res = await API.getStudentResult(studentId, session, term);
+        if (!res.data) {
+          container.innerHTML = `<div class="empty-state"><p class="empty-state__title">${res.message || "No results available"}</p></div>`;
+          return;
+        }
+        renderResultSheet(res.data, container);
+      } catch (err) {
+        container.innerHTML = `<div class="alert alert--error">${err.message}</div>`;
+      }
+    }
+
+    function renderResultSheet(data, container) {
+      const student = DEMO_DATA.students.find(s => s.id === data.studentId) || {};
+      const subjects = data.subjects || [];
+      const rows = subjects.map(s => `
+        <tr>
+          <td>${s.name}</td>
+          <td>${s.ca}</td>
+          <td>${s.exam}</td>
+          <td><strong>${s.total}</strong></td>
+          <td>${s.grade}</td>
+          <td>${s.remark}</td>
+        </tr>
+      `).join("");
+
+      container.innerHTML = `
+        <div class="result-sheet">
+          <div class="result-sheet__header">
+            <div class="logo__mark" style="width:56px;height:56px;font-size:1.4rem;flex-shrink:0;">H</div>
+            <div class="result-sheet__school-info">
+              <h1>De-Pythagoras College</h1>
+              <p>12 Academic Boulevard, Victoria Island, Lagos</p>
+              <p>Tel: +234 801 234 5678 · info@harmonyheights.edu.ng</p>
+            </div>
+          </div>
+          <div class="result-sheet__title">${data.term} Academic Report — ${data.session}</div>
+          <div class="result-sheet__student-info">
+            <div>
+              <p><strong>Student:</strong> ${student.fullName || data.studentId}</p>
+              <p><strong>Student ID:</strong> ${data.studentId}</p>
+              <p><strong>Class:</strong> ${student.class || ""} ${student.classArm || ""}</p>
+              <p><strong>Session:</strong> ${data.session}</p>
+            </div>
+          </div>
+          <table class="result-sheet__table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>C.A. (40)</th>
+                <th>Exam (60)</th>
+                <th>Total</th>
+                <th>Grade</th>
+                <th>Remark</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div class="result-sheet__summary">
+            <div class="result-sheet__summary-item"><span>Average</span><strong>${data.average ?? "—"}%</strong></div>
+            <div class="result-sheet__summary-item"><span>Position</span><strong>${data.position ?? "—"} / ${data.outOf ?? "—"}</strong></div>
+            <div class="result-sheet__summary-item"><span>Attendance</span><strong>${data.attendance?.percentage ?? "—"}%</strong></div>
+            <div class="result-sheet__summary-item"><span>Status</span><strong>${data.status}</strong></div>
+          </div>
+          <div class="result-sheet__comments">
+            <p><strong>Teacher's Comment:</strong> ${data.teacherComment || "—"}</p>
+            <p><strong>Principal's Comment:</strong> ${data.principalComment || "—"}</p>
+          </div>
+          <div class="result-sheet__signatures">
+            <div><div class="result-sheet__sig-line">Class Teacher</div></div>
+            <div><div class="result-sheet__sig-line">Principal</div></div>
+            <div><div class="result-sheet__sig-line">Date</div></div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById("load-results-btn").addEventListener("click", loadResults);
+    // Auto-load current term
+    loadResults();
+  </script>
+</body>
+</html>
